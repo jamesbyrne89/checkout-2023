@@ -1,6 +1,9 @@
 import React from "react";
 
-export const StarIcon = ({ fill, ...props }: React.SVGProps<SVGSVGElement>) => {
+export const StarIcon = ({
+  fill = "currentColor",
+  ...props
+}: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="1em"
