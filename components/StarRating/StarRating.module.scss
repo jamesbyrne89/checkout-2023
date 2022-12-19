@@ -1,6 +1,17 @@
+.container {
+  border: none;
+
+  legend {
+    display: block;
+    margin-bottom: var(--input-label-margin-bottom);
+    font-weight: bold;
+  }
+}
+
 .stars {
   display: flex;
   gap: 0.5rem;
+  color: var(--ui-color-blue);
 }
 
 .visuallyHidden {
@@ -14,7 +25,16 @@
   white-space: nowrap;
   width: 1px;
 
+  &:focus-visible + label {
+    outline: solid 2px var(--ui-color-blue);
+  }
+
   + label {
     font-size: 1.5rem;
   }
+}
+
+.errorMessage {
+  color: var(--ui-color-red);
+  min-height: 1.375rem;
 }

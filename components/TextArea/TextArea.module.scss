@@ -4,7 +4,31 @@
   textarea {
     display: block;
     width: 100%;
-    height: 12rem;
+    height: 14rem;
     resize: none;
+    position: relative;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.675;
+    font-family: inherit;
+    font-size: var(--input-font-size);
+    border-radius: var(--border-radius);
+    border: solid 1px var(--input-border-color);
+    caret-color: var(--ui-color-blue);
   }
+
+  textarea.invalid {
+    border: solid 1px var(--ui-color-red);
+  }
+}
+
+.errorMessage {
+  min-height: 1.375rem;
+  color: var(--ui-color-red);
+}
+
+.labelText {
+  display: block;
+  margin-bottom: var(--input-label-margin-bottom);
+  font-size: var(--input-label-font-size);
+  font-weight: bold;
 }

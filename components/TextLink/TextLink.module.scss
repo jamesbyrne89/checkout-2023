@@ -1,0 +1,11 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ui-color-blue);
+  line-height: 1;
+
+  svg {
+    transform: translateY(0.125rem);
+  }
+}

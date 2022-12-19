@@ -1,0 +1,25 @@
+.title {
+  margin-bottom: 2rem;
+}
+
+.list {
+  list-style: none;
+}
+
+.comment {
+  position: relative;
+  margin-bottom: 3rem;
+  &:not(&:last-of-type)::after {
+    content: "";
+    position: absolute;
+    width: 50%;
+    left: 25%;
+    bottom: -1.5rem;
+    border-top: solid 1px grey;
+  }
+}
+
+.email {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}

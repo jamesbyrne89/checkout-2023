@@ -1,10 +1,73 @@
+import { Controller, useForm } from "react-hook-form";
+
+import { Button } from "components/Button";
+import { Comment } from "components/LatestComments/LatestComments";
+import { FieldValues } from "react-hook-form/dist/types";
 import Head from "next/head";
+import { Page } from "components/Page";
 import { StarRating } from "components/StarRating";
 import { TextArea } from "components/TextArea";
 import { TextInput } from "components/TextInput";
+import { calculateSizeAdjustValues } from "next/dist/server/font-utils";
+import isEmail from "validator/lib/isEmail";
 import styles from "../styles/Home.module.scss";
+import { useCallback } from "react";
+import { useLocalStorage } from "hooks/useLocalStorage";
+import { useRouter } from "next/router";
+
+const generateRandomGuid = () =>
+  Math.floor((1 + Math.random()) * 0x10000).toString(16);
 
 export default function Home() {
+  const router = useRouter();
+  const [currentFeedback, setCurrentFeedback] = useLocalStorage<Comment[]>(
+    "feedback",
+    []
+  );
+  const {
+    register,
+    handleSubmit,
+    formState,
+    control,
+    watch,
+    trigger,
+    setError,
+    setValue,
+    clearErrors,
+  } = useForm({
+    mode: "onBlur",
+    defaultValues: {
+      fullName: "",
+      email: "",
+      starRating: 0,
+      comments: "",
+    },
+  });
+  console.log(watch("starRating"));
+  const onSubmit = (formData: FieldValues) => {
+    const { email, fullName, starRating, comments } = formData;
+    const newFeedback: Comment = {
+      email,
+      fullName,
+      rating: starRating,
+      text: comments,
+      id: generateRandomGuid(),
+    };
+    setCurrentFeedback([...currentFeedback, newFeedback]);
+    router.push("/submitted");
+  };
+
+  const onStarRatingChange = useCallback(
+    (val: number) => {
+      console.log("change", val);
+      clearErrors("starRating");
+      setValue("starRating", val);
+    },
+    [clearErrors, setValue]
+  );
+
+  const starRating = watch("starRating");
+
   return (
     <>
       <Head>
@@ -13,21 +76,67 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
+      <Page>
         <h1>Submit your feedback</h1>
-        <form className={styles.form}>
+        <p>Fields marked with * are required</p>
+        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <div>
             <div className={styles.inputWrapper}>
-              <TextInput label="Full name" id="input-full-name" />
+              <TextInput
+                label="Full name"
+                id="input-full-name"
+                required
+                {...register("fullName", {
+                  required: "Full name is required",
+                })}
+                errorMessage={formState.errors.fullName?.message?.toString()}
+              />
             </div>
             <div className={styles.inputWrapper}>
-              <TextInput label="Email" id="input-email" />
+              <TextInput
+                label="Email"
+                id="input-email"
+                required
+                {...register("email", {
+                  validate: (val) => isEmail(val) || "Must be a valid email",
+                })}
+                errorMessage={formState.errors.email?.message?.toString()}
+              />
             </div>
-            <StarRating />
+            <div className={styles.inputWrapper}>
+              <StarRating
+                onSelectionChange={onStarRatingChange}
+                errorMessage={formState.errors.starRating?.message?.toString()}
+                onBlur={(e) => {
+                  console.log("blur", e.target.value);
+                  if (!(starRating > 0)) {
+                    setError("starRating", {
+                      message: "You must provide a rating",
+                    });
+                  }
+                }}
+              />
+            </div>
           </div>
-          <TextArea label="Comments" id="input-comments" />
+          <div>
+            <div className={styles.inputWrapper}>
+              <TextArea
+                label="Comments"
+                id="input-comments"
+                placeholder="Tell us what you thought"
+                required
+                {...register("comments", {
+                  required: "Comments are required",
+                })}
+                errorMessage={formState.errors.comments?.message?.toString()}
+              />
+            </div>
+            <div className={styles.submitBtn}>
+              <Button label="Submit" disabled={!formState.isValid} />
+            </div>
+          </div>
         </form>
-      </main>
+      </Page>
     </>
   );
 }

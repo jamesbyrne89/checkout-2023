@@ -1,0 +1,26 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.625rem 2rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background-color: var(--ui-color-blue);
+  border-radius: var(--border-radius);
+  border: none;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  color: white;
+  transition: background-color 0.25s ease-in-out;
+
+  &[disabled] {
+    background-color: #b5bec4;
+  }
+
+  &:focus-visible {
+    outline: solid 2px black;
+  }
+}
