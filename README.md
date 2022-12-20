@@ -12,23 +12,42 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Running tests
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+First, start the app:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+`npm run dev` or `yarn dev`
 
-## Learn More
+Then, run the Cypress tests:
 
-To learn more about Next.js, take a look at the following resources:
+`npm run cypress` or `yarn cypress`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Technical decisions
 
-## Deploy on Vercel
+The app is built using NextJS. I chose this partly because of its excellent developer experience, but also for performance reasons.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+I used react-hook-form to manage the state of the feedback form. I have used this library in the past and like the way it embraces uncontrolled components and makes it easy to handle field validation. However, I did find that validation didn't work quite so well with the star rating component (which is a group of radio buttons under the hood), resulting in some untidy workarounds.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+For styling I chose CSS modules (with Sass), as it deals with the issue of isolating component styles, while remaining more performant than CSS-in-JS options.
+
+As there was little guidance on how the feedback form data should be persisted between page loads, I chose to store feedback in localStorage.
+
+I chose the recharts library for the chart showing the distribution of ratings. I have experience using this library in my current role and like its ease-of-use, responsiveness and performance.
+
+I tested the app using Cypress, as relatively short tests can cover large portions of the app. However, with more time I would have also unit tested components and other functionality such as custom React hooks.
+
+
+## UX decisions
+
+I decided to stick relatively closely to the wireframes so I had more time to focus on the code. The main decisions I made were:
+
+- Form validation: I chose to validate fields on blur (i.e. as soon as the user tabs away from the field). This was to provide feedback to the user as quickly as possible, so they didn't have to submit the entire form before finding out that their input was invalid. Further to this, the submit button is disabled until the form is valid, to make it impossible to accidentally submit invalid data.
+
+- Star ratings: I chose to make this component more interactive than a simple number or text input, to provide a more intuitive user experience that more closely resembled how a real app would work.
+  
+- Design: I chose to keep this very simple, to focus more on the code and on the user experience.
+
+- Accessibility: I tried to consider accessibility throughout the app, by using semantic HTML and appropriate ARIA markup where necessary.
+
+With more time, I may have added additional information to the list of submitted comments, such as how long ago the feedback was submitted, or the user's full name. Similarly, I may have added cards summarising the feedback received, to support the chart (e.g. "Number of comments received", "Average rating", etc).
