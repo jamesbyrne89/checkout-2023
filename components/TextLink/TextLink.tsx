@@ -1,4 +1,5 @@
-import { ArrowLeftIcon } from "components/icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "components/icons";
+
 import Link from "next/link";
 import styles from "./TextLink.module.scss";
 

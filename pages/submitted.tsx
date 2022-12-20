@@ -4,37 +4,24 @@ import { Comment, LatestComments } from "components/LatestComments";
 import Head from "next/head";
 import { Page } from "components/Page";
 import { TextLink } from "components/TextLink";
+import dynamic from "next/dynamic";
 import styles from "../styles/Submitted.module.scss";
 import { useLocalStorage } from "hooks/useLocalStorage";
 
-const dummyComments: Comment[] = [
+const LazyLoadedLatestComments = dynamic(
+  () => import("components/LatestComments"),
   {
-    fullName: "Bob Smith",
-    email: "bob.smith@company.com",
-    text: "This is great!",
-    rating: 5,
-    id: Math.floor((1 + Math.random()) * 0x10000).toString(16),
-  },
-  {
-    fullName: "Joe Bloggs",
-    email: "joe@gmail.com",
-    rating: 3,
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper ultricies nulla ac maximus. Integer sollicitudin feugiat est, sodales venenatis lorem tincidunt et. Nulla rutrum quam eget quam sagittis elementum. Aenean vel nisi ac orci tristique placerat. Morbi commodo mauris eu dignissim hendrerit. Duis ornare odio et lacinia lacinia. Maecenas nec gravida metus.",
-    id: Math.floor((1 + Math.random()) * 0x10000).toString(16),
-  },
-];
+    ssr: false,
+  }
+);
 
 export default function Submitted() {
-  const [feedback] = useLocalStorage<Comment[]>("feedback", dummyComments);
+  const [feedback] = useLocalStorage<Comment[]>("feedback", []);
 
-  console.log({ feedback });
-
-  const data = feedback.reduce(
+  const ratingDistribution = feedback.reduce(
     (acc, curr) => {
       const found = acc.find((i) => i.rating === curr.rating);
-      console.log(curr);
       if (found) {
-        console.log({ found });
         found.count += 1;
       }
       return acc;
@@ -47,6 +34,10 @@ export default function Submitted() {
       { rating: 5, count: 0 },
     ]
   );
+
+  function formatYAxis(value: 1 | 2 | 3 | 4 | 5) {
+    return `${value} stars`;
+  }
 
   return (
     <>
@@ -61,10 +52,11 @@ export default function Submitted() {
           <h1>Feedback Results</h1>
           <TextLink arrowDirection="left" href="/" label="Go back" />
         </header>
+        <h2 className={styles.graphTitle}>Rating distribution</h2>
         <div className={styles.graphWrapper}>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={730} height={250} data={data}>
-              <XAxis dataKey="rating" />
+            <BarChart width={730} height={250} data={ratingDistribution}>
+              <XAxis dataKey="rating" tickFormatter={formatYAxis} />
               <YAxis
                 dataKey="count"
                 stroke="var(--ui-color-near-black)"
@@ -74,7 +66,7 @@ export default function Submitted() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <LatestComments comments={feedback} />
+        <LazyLoadedLatestComments comments={feedback} />
       </Page>
     </>
   );

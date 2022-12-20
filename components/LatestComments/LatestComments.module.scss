@@ -15,11 +15,15 @@
     width: 50%;
     left: 25%;
     bottom: -1.5rem;
-    border-top: solid 1px grey;
+    border-top: solid 1px var(--ui-color-mid-grey);
   }
 }
 
 .email {
   font-weight: bold;
   margin-bottom: 1rem;
+}
+
+.link {
+  font-weight: bold;
 }

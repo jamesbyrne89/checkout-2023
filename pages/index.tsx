@@ -1,4 +1,4 @@
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useEffect } from "react";
 
 import { Button } from "components/Button";
 import { Comment } from "components/LatestComments/LatestComments";
@@ -8,15 +8,11 @@ import { Page } from "components/Page";
 import { StarRating } from "components/StarRating";
 import { TextArea } from "components/TextArea";
 import { TextInput } from "components/TextInput";
-import { calculateSizeAdjustValues } from "next/dist/server/font-utils";
 import isEmail from "validator/lib/isEmail";
 import styles from "../styles/Home.module.scss";
-import { useCallback } from "react";
+import { useForm } from "react-hook-form";
 import { useLocalStorage } from "hooks/useLocalStorage";
 import { useRouter } from "next/router";
-
-const generateRandomGuid = () =>
-  Math.floor((1 + Math.random()) * 0x10000).toString(16);
 
 export default function Home() {
   const router = useRouter();
@@ -28,12 +24,12 @@ export default function Home() {
     register,
     handleSubmit,
     formState,
-    control,
     watch,
-    trigger,
+    setFocus,
     setError,
     setValue,
     clearErrors,
+    trigger,
   } = useForm({
     mode: "onBlur",
     defaultValues: {
@@ -43,30 +39,43 @@ export default function Home() {
       comments: "",
     },
   });
-  console.log(watch("starRating"));
+
   const onSubmit = (formData: FieldValues) => {
     const { email, fullName, starRating, comments } = formData;
+
+    if (!starRating) {
+      setError("starRating", {
+        message: "You must provide a rating",
+      });
+      return;
+    }
+
     const newFeedback: Comment = {
       email,
       fullName,
       rating: starRating,
       text: comments,
-      id: generateRandomGuid(),
+      submittedUtc: new Date().toISOString(),
     };
+
     setCurrentFeedback([...currentFeedback, newFeedback]);
     router.push("/submitted");
   };
 
   const onStarRatingChange = useCallback(
     (val: number) => {
-      console.log("change", val);
-      clearErrors("starRating");
       setValue("starRating", val);
+      clearErrors("starRating");
+      trigger("starRating");
     },
-    [clearErrors, setValue]
+    [trigger, clearErrors, setValue]
   );
 
   const starRating = watch("starRating");
+
+  useEffect(() => {
+    setFocus("fullName", { shouldSelect: true });
+  }, [setFocus]);
 
   return (
     <>
@@ -78,7 +87,9 @@ export default function Home() {
       </Head>
       <Page>
         <h1>Submit your feedback</h1>
-        <p>Fields marked with * are required</p>
+        <p className={styles.formInstructions}>
+          Fields marked with * are required
+        </p>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <div>
             <div className={styles.inputWrapper}>
@@ -108,8 +119,11 @@ export default function Home() {
                 onSelectionChange={onStarRatingChange}
                 errorMessage={formState.errors.starRating?.message?.toString()}
                 onBlur={(e) => {
-                  console.log("blur", e.target.value);
-                  if (!(starRating > 0)) {
+                  // Don't error if user is still focused on stars
+                  if (
+                    !e.relatedTarget?.id.includes("input-stars-") &&
+                    !starRating
+                  ) {
                     setError("starRating", {
                       message: "You must provide a rating",
                     });

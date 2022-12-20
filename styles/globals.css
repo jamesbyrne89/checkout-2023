@@ -10,9 +10,9 @@
   --input-label-font-size: 0.875rem;
   --input-label-margin-bottom: 0.5rem;
   --input-font-size: 0.875rem;
-  --input-border-color: #b5bec4;
   --ui-color-red: #ec0049;
   --ui-color-blue: #0c0adb;
+  --ui-color-mid-grey: #b5bec4;
   --ui-color-near-black: #313131;
 }
 
@@ -36,7 +36,6 @@ body {
 
 a {
   color: inherit;
-  text-decoration: none;
 }
 
 @media (prefers-color-scheme: dark) {
