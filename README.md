@@ -20,7 +20,7 @@ First, start the app:
 
 Then, run the Cypress tests:
 
-`npm run cypress` or `yarn cypress`
+`npm test` or `yarn test`
 
 
 ## Technical decisions
